@@ -34,9 +34,7 @@ export function useAllTeams() {
   useEffect(() => {
     async function fetchData() {
       // Call the AEM GraphQL persisted query named "my-project/all-teams"
-      const { data, err } = await fetchPersistedQuery(
-        "reacts-eds/all-teams"
-      );
+      const { data, err } = await fetchPersistedQuery("my-project/all-teams");
       // Sets the teams variable to the list of team JSON objects
       setTeams(data?.teamList?.items);
       // Set any errors
@@ -61,7 +59,7 @@ export function usePersonByName(fullName) {
 
       // Invoke the persisted query, and pass in the queryParameters object as the 2nd parameter
       const { data, err } = await fetchPersistedQuery(
-        "reacts-eds/person-by-name",
+        "my-project/person-by-name",
         queryParameters
       );
 
@@ -81,4 +79,3 @@ export function usePersonByName(fullName) {
 
   return { person, errors };
 }
-

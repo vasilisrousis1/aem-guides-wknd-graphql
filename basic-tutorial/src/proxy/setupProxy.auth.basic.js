@@ -16,12 +16,13 @@ const { REACT_APP_HOST_URI, REACT_APP_BASIC_AUTH_USER, REACT_APP_BASIC_AUTH_PASS
 
 module.exports = function(app) {
   app.use(
-    ['/content', '/graphql'],
+    ["/content", "/graphql"],
     createProxyMiddleware({
       target: REACT_APP_HOST_URI,
       changeOrigin: true,
+      secure: false, // Ignore SSL certificate errors
       // pass in credentials when developing against an Author environment
-      auth: `${REACT_APP_BASIC_AUTH_USER}:${REACT_APP_BASIC_AUTH_PASS}`
+      auth: `${REACT_APP_BASIC_AUTH_USER}:${REACT_APP_BASIC_AUTH_PASS}`,
     })
   );
 };
