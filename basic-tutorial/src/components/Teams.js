@@ -55,7 +55,11 @@ function Team({ _path, title, shortName, description, teamMembers }) {
       >
         {description.plaintext}
       </p>
-      <div>
+      <div
+        data-aue-prop="teamMembers"
+        data-aue-type="container"
+        data-aue-label="members"
+      >
         <h4 className="team__members-title">Members</h4>
         <ul className="team__members">
           {/* Render the referenced Person models associated with the team */}
