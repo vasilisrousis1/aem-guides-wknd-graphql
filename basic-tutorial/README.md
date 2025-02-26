@@ -53,6 +53,15 @@ Several [environment variables](https://create-react-app.dev/docs/adding-custom-
 * `REACT_APP_DEV_TOKEN` - Dev token string. To connect to remote instance, you can use Bearer auth with a local [DEV token from Cloud console](https://experienceleague.adobe.com/docs/experience-manager-learn/getting-started-with-aem-headless/authentication/local-development-access-token.html)
 * `REACT_APP_SERVICE_TOKEN` - Path to service token file. To connect to remote instance, authentication can be done with [Service token also (download file from Cloud console)](https://experienceleague.adobe.com/docs/experience-manager-learn/getting-started-with-aem-headless/authentication/service-credentials.html)
 
+* A .env file should be created inside /basic-tutorial/universal-editor-service folder with these properties:
+
+  ```
+    UES_PORT=8000
+    UES_TLS_REJECT_UNAUTHORIZED=false
+    UES_DISABLE_IMS_VALIDATION=Yes
+    UES_CORS_PRIVATE_NETWORK=true
+  ```
+
 ### Proxy API Requests
 
 When using the webpack development server (`npm start`) the project relies on a [proxy setup](https://create-react-app.dev/docs/proxying-api-requests-in-development/#configuring-the-proxy-manually) using `http-proxy-middleware`. The file is configured at [src/setupProxy.js](src/setupProxy.js) and relies on several custom environment variables set at `.env` and `.env.development`.
@@ -80,6 +89,15 @@ Several CORS configurations must be set on the target AEM environment:
 ![CORS Configuration](docs/cross-origin-resource-sharing-configuration.png)
 
 *This is a sample CORS config for Author environment if Proxy is set to False*
+
+### Initialization
+
+After everything has been set up in order to initialize the local AEM instance, local Universal Editor Service and the necessary proxies alltogether, run the the start-all.sh shell script for Mac.
+This initializes the:
+    * AEM author instance on localhost:4502 and https proxy on localhost:8443
+    * Universal Editor service on localhost:8000 and respective https proxy on localhost:8001
+    * Opens a browser tab on the Adobe Experience Cloud site to use the Universal Editor browser tool. In order for the editor to work it is necessary to add "Basic YWRtaW46YWRtaW4=" string to the            Authentication Header form on the the top right.
+    
 
 ## Documentation
 
