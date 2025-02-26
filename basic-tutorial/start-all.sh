@@ -6,8 +6,26 @@
 cleanup() {
   echo
   echo "Stopping all background processes..."
-  # This kills the entire process group (the script plus its children)
-  kill 0
+  # Kill all the processes we started specifically, so the script itself
+  # isn't killed prematurely (which can happen with 'kill 0').
+  kill "$AEM_PID" "$UES_PID" "$SSL_1_PID" "$SSL_2_PID" "$REACT_PID" 2>/dev/null
+
+  echo "Waiting for AEM to fully stop..."
+  # Loop until AEM no longer responds on port 4502
+  while true; do
+    STATUS=$(curl -s -u admin:admin -o /dev/null -w "%{http_code}" http://localhost:4502/)
+    # When AEM process is truly down (no socket listening), curl returns code "000"
+    if [ "$STATUS" = "000" ]; then
+      echo "AEM is down (HTTP code $STATUS)."
+      break
+    else
+      echo "AEM responded with $STATUS, still shutting down..."
+    fi
+    sleep 5
+  done
+
+  echo "All processes have been stopped."
+  exit 0
 }
 
 # When script receives Ctrl+C (SIGINT), call cleanup()
@@ -19,8 +37,7 @@ trap cleanup INT
 echo "Starting AEM Author..."
 cd ~/aem-sdk/author
 
-# Start in background (no nohup). Output goes to console, or redirect if you like.
-java -jar aem-author-p4502.jar &  
+java -jar aem-author-p4502.jar &
 AEM_PID=$!
 
 echo "Waiting for AEM to start..."
@@ -36,7 +53,6 @@ while true; do
   sleep 5
 done
 
-# Optional extra time to let bundles fully start
 sleep 5
 echo "AEM (PID $AEM_PID) is up and running!"
 
@@ -46,7 +62,7 @@ echo "AEM (PID $AEM_PID) is up and running!"
 echo "Starting Universal Editor Service (UES)..."
 cd ~/aem-guides-wknd-graphql/basic-tutorial/universal-editor-service
 
-node universal-editor-service.cjs &  
+node universal-editor-service.cjs &
 UES_PID=$!
 
 echo "UES (PID $UES_PID) started."
@@ -55,10 +71,10 @@ echo "UES (PID $UES_PID) started."
 # 3. Start SSL Proxies
 ########################################
 echo "Starting SSL proxies..."
-local-ssl-proxy --source 8443 --target 4502 &  
+local-ssl-proxy --source 8443 --target 4502 &
 SSL_1_PID=$!
 
-local-ssl-proxy --source 8001 --target 8000 &  
+local-ssl-proxy --source 8001 --target 8000 &
 SSL_2_PID=$!
 
 echo "SSL proxies started with PIDs $SSL_1_PID and $SSL_2_PID."
@@ -69,33 +85,22 @@ echo "SSL proxies started with PIDs $SSL_1_PID and $SSL_2_PID."
 echo "Starting local React app..."
 cd ~/aem-guides-wknd-graphql/basic-tutorial
 
-npm start &  
+npm start &
 REACT_PID=$!
 
 echo "React (PID $REACT_PID) started."
 
 ########################################
-# 4a. Open UES cloud in default browser
+# 4a. Delay and then open UES cloud in default browser
 ########################################
-sleep 10
-
+sleep 5
 TARGET_URL="https://experience.adobe.com/#/@deloitteemeasouthpartnersdbx/aem/editor/canvas/localhost:3000/"
 echo "Opening new tab in default browser to: $TARGET_URL"
 
 case "$OSTYPE" in
-  darwin*) 
-    # macOS
-    open "$TARGET_URL"
-    ;;
-  linux*)
-    # Linux
-    xdg-open "$TARGET_URL"
-    ;;
-  *)
-    # Other (e.g. Windows/Cygwin)
-    echo "Please open the following URL manually:"
-    echo "$TARGET_URL"
-    ;;
+  darwin*) open "$TARGET_URL" ;;
+  linux*)  xdg-open "$TARGET_URL" ;;
+  *)       echo "Please open the following URL manually: $TARGET_URL" ;;
 esac
 
 ########################################
