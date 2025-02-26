@@ -97,7 +97,7 @@ This initializes the:
 
 * AEM author instance on localhost:4502 and https proxy on localhost:8443
 * Universal Editor service on localhost:8000 and respective https proxy on localhost:8001
-* Opens a browser tab on the Adobe Experience Cloud site to use the Universal Editor browser tool. In order for the editor to work it is necessary to add "Basic YWRtaW46YWRtaW4=" string to the            Authentication Header form on the the top right.
+* Opens a browser tab on the Adobe Experience Cloud site to use the Universal Editor browser tool. In order for the editor to work it is necessary to add "Basic YWRtaW46YWRtaW4=" string to the            Authentication Header form on the the top right.(Only for local development)
     
 
 ## Documentation
